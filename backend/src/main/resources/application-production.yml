@@ -1,0 +1,89 @@
+spring:
+  application:
+    name: ReserveEase Backend
+  
+  datasource:
+    url: jdbc:mysql://${DB_HOST:localhost}:3306/${DB_NAME:reserveease}?useSSL=true&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:password}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        format_sql: false
+        
+  mail:
+    host: email-smtp.${AWS_REGION:us-east-1}.amazonaws.com
+    port: 587
+    username: ${SES_USERNAME:}
+    password: ${SES_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          connectiontimeout: 10000
+          timeout: 10000
+          writetimeout: 10000
+
+server:
+  port: ${SERVER_PORT:8080}
+  servlet:
+    context-path: /api
+  compression:
+    enabled: true
+    min-response-size: 1024
+    mime-types: application/json,application/xml,text/html,text/xml,text/plain
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    export:
+      cloudwatch:
+        enabled: true
+        namespace: ReserveEase/Backend
+        step: 60s
+
+logging:
+  level:
+    com.cottage.reservation: INFO
+    org.springframework.security: INFO
+    org.hibernate.SQL: ERROR
+  file:
+    name: /var/log/reserveease/application.log
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+jwt:
+  secret: ${JWT_SECRET:ReserveEaseSecretKey2024}
+  expiration: 86400000 # 24 hours
+
+app:
+  name: ReserveEase
+  version: 1.0.0
+  description: Free reservation system for easy booking management
+  contact:
+    email: admin@reserveease.com
+    name: ReserveEase Team
+  frontend-url: ${FRONTEND_URL:https://reserveease.com}
+  
+cors:
+  allowed-origins: 
+    - https://reserveease.com
+    - https://www.reserveease.com
+  allowed-methods: GET,POST,PUT,DELETE,OPTIONS
+  allowed-headers: "*"
